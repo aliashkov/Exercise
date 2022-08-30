@@ -8,6 +8,9 @@ cap = cv2.VideoCapture(0)
 
 counter = 0
 stage = None
+correctHand = 0
+leftHandY = 0
+leftShoulderY = 0
 
 
 def calculate_angle(a, b, c):
@@ -33,6 +36,7 @@ def calculate_angle_2(a, b):
     if angle > 180.0:
         angle = 360-angle
     return angle
+
 
 with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
     while cap.isOpened():
@@ -70,7 +74,11 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             angleRightHand = calculate_angle(
                 shoulderRight, elbowRight, wristRight)
 
-
+            wristLeftY = landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y
+            wristRightY = landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y
+            shoulderLeftY = landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y
+            shoulderRightY = landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y
+            
             # Visualize angle
             cv2.putText(image, str(angleLeftHand),
                         tuple(np.multiply(elbowLeft, [640, 480]).astype(int)),
@@ -83,26 +91,41 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,
                                                         255, 255), 2, cv2.LINE_AA
                         )
-
             # Counter logic
-            
-            if anglePose < 165 or angleLeftShoulder < 150 or angleRightShoulder < 150:
+            if landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x <= 0.1 or landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x >= 0.9 or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x <= 0.1 or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x >= 0.9:
+                stage = "-vis"
+            elif anglePose < 165 or angleLeftShoulder < 155 or angleRightShoulder < 155:
                 stage = "-pose"
-            elif anglePose >= 165 and angleLeftShoulder >= 150 and angleRightShoulder >= 150 and angleLeftHand > 160 and angleRightHand > 160:
+            elif anglePose >= 165 and angleLeftShoulder >= 155 and angleRightShoulder >= 155 and angleLeftHand < 30 and angleRightHand > 160 and stage == '+pose' and stage != 'right':
+                if wristLeftY  > (shoulderLeftY + shoulderRightY) / 2 and landmarks[mp_pose.PoseLandmark.LEFT_INDEX.value].x <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) / 1.5:
+                   if landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y <= ((shoulderLeftY + shoulderRightY) / 2) + 0.01  :
+                      stage = "right"
+                      counter += 1
+                   elif landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y > (shoulderLeftY + shoulderRightY) / 2 + 0.01 :
+                      stage = "-hand"
+            elif anglePose >= 165 and angleLeftShoulder >= 155 and angleRightShoulder >= 155 and angleLeftHand > 160 and angleRightHand < 30 and stage == '+pose' and stage != 'left':
+                if wristRightY  > (shoulderLeftY + shoulderRightY) / 2 and landmarks[mp_pose.PoseLandmark.RIGHT_INDEX.value].x <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) / 1.5:
+                   if landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y <= ((shoulderLeftY + shoulderRightY) / 2) + 0.01  :
+                      stage = "left"
+                      counter += 1
+                   elif landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y > (shoulderLeftY + shoulderRightY) / 2 + 0.01 :
+                      stage = "-hand"
+            elif anglePose >= 165 and angleLeftShoulder >= 155 and angleRightShoulder >= 155 and angleLeftHand > 160 and angleRightHand < 30 and stage == 'right':
+                if wristRightY  > (shoulderLeftY + shoulderRightY) / 2 and landmarks[mp_pose.PoseLandmark.RIGHT_INDEX.value].x <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) / 1.5:
+                   if landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y <= ((shoulderLeftY + shoulderRightY) / 2) + 0.01  :
+                      stage = "left"
+                      counter += 1
+                   elif landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y > (shoulderLeftY + shoulderRightY) / 2 + 0.01 :
+                      stage = "-hand"
+            elif anglePose >= 165 and angleLeftShoulder >= 155 and angleRightShoulder >= 155 and angleLeftHand < 30 and angleRightHand > 160 and stage == 'left':
+                if wristLeftY  > (shoulderLeftY + shoulderRightY) / 2 and landmarks[mp_pose.PoseLandmark.LEFT_INDEX.value].x <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) / 1.5:
+                   if landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y <= ((shoulderLeftY + shoulderRightY) / 2) + 0.01  :
+                      stage = "right"
+                      counter += 1
+                   elif landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y > (shoulderLeftY + shoulderRightY) / 2 + 0.01 :
+                      stage = "-hand"
+            elif anglePose >= 165 and angleLeftShoulder >= 155 and angleRightShoulder >= 155 and angleLeftHand > 160 and angleRightHand > 160 and landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x > 0.1 and landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x < 0.9 and landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x > 0.1 and landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x < 0.9:
                 stage = "+pose"
-            elif anglePose >= 165 and angleLeftShoulder >= 150 and angleRightShoulder >= 150 and angleLeftHand < 30 and angleRightHand > 160 and stage == '+pose' and stage !='right':
-                stage = "right"
-                counter += 1
-            elif anglePose >= 165 and angleLeftShoulder >= 150 and angleRightShoulder >= 150 and angleLeftHand > 160 and angleRightHand < 30 and stage == '+pose' and stage !='left':
-                stage = "left"
-                counter += 1
-            elif anglePose >= 165 and angleLeftShoulder >= 150 and angleRightShoulder >= 150 and angleLeftHand > 160 and angleRightHand < 30 and stage == 'right':
-                stage = "left"
-                counter += 1
-            elif anglePose >= 165 and angleLeftShoulder >= 150 and angleRightShoulder >= 150 and angleLeftHand < 30 and angleRightHand > 160 and stage == 'left':
-                stage = "right"
-                counter += 1
-                # print(counter)
 
         except:
             pass
