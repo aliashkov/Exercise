@@ -90,8 +90,6 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                                                         255, 255), 2, cv2.LINE_AA
                         )
 
-            # print(lastStage)
-
             # Counter logic
             if landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x <= 0.05 or landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x >= 0.95 or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x <= 0.05 or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x >= 0.95:
                 stage = "out of vision"
