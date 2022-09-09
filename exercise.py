@@ -10,7 +10,6 @@ counter = 0
 stage = None
 lastStage = None
 
-
 def calculate_angle(a, b, c):
     a = np.array(a)  # First
     b = np.array(b)  # Mid
@@ -91,6 +90,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                         )
 
             # Counter logic
+            
             if landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x <= 0.05 or landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x >= 0.95 or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x <= 0.05 or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x >= 0.95:
                 stage = "out of vision"
             elif anglePose < 160 or angleLeftShoulder < 150 or angleRightShoulder < 150 or stage == "out of vision":
