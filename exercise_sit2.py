@@ -214,20 +214,20 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                 elif lastStage == "left position":
                     stage = "return left hand to the side, right hand to the elbow"
             elif anglePose >= 160 and leftShoulderCheck == True and rightShoulderCheck == True and angleLeftHand < 30 and landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x / 2.5 <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x)  and (angleRightHand > 160) and stage == 'initial pose' and stage != 'right position':
-                if wristLeftY > ((shoulderLeftY + shoulderRightY) / 2) - 0.1 and landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x / 2.5 <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) :
-                    if landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y > shoulderLeftY + 0.1 and leftWristXCounter > 4:
+                if wristLeftY > ((shoulderLeftY + shoulderRightY) / 2) - 0.07 and landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x / 2.5 <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) :
+                    if landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y > shoulderLeftY + 0.05 and leftWristXCounter > 4:
                         lastStage = None
                         stage = "return hands to the sides"
-                    elif landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y <= shoulderLeftY + 0.1  and leftWristXCounter > 1  and stage != 'return hands to the sides':
+                    elif landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y <= shoulderLeftY + 0.05  and leftWristXCounter > 1  and stage != 'return hands to the sides':
                         stage = "right position"
                         lastStage = "right position"
                         counter += 1
             elif anglePose >= 160 and leftShoulderCheck == True  and rightShoulderCheck == True and angleLeftHand > 160 and angleRightHand < 30  and landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) / 1.8 and stage == 'initial pose' and stage != 'left position':
-                if wristRightY > ((shoulderLeftY + shoulderRightY) / 2) - 0.1 and landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x   <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) / 1.8 :
-                    if landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y > shoulderRightY + 0.1 and rightWristXCounter > 4:
+                if wristRightY > ((shoulderLeftY + shoulderRightY) / 2) - 0.07 and landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x   <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) / 1.8 :
+                    if landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y > shoulderRightY + 0.05 and rightWristXCounter > 4:
                         lastStage = None
                         stage = "return hands to the sides"
-                    elif landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y <= shoulderRightY + 0.1 and rightWristXCounter > 1 and stage != 'return hands to the sides':
+                    elif landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y <= shoulderRightY + 0.05 and rightWristXCounter > 1 and stage != 'return hands to the sides':
                         stage = "left position"
                         lastStage = "left position"
                         counter += 1
@@ -244,11 +244,11 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                    lastStage = "right position"
             elif anglePose >= 160 and leftShoulderCheck == True  and rightShoulderCheck == True and angleLeftHand > 160  and angleRightHand < 30  and landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) / 1.8 and stage == 'right position':
 
-                if  wristRightY > ((shoulderLeftY + shoulderRightY) / 2) - 0.1 and landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) / 1.8:
-                    if landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y > shoulderRightY + 0.1 and rightWristXCounter > 4:
+                if  wristRightY > ((shoulderLeftY + shoulderRightY) / 2) - 0.07 and landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) / 1.8:
+                    if landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y > shoulderRightY + 0.05 and rightWristXCounter > 4:
                         stage = "return right hand to the side, left hand to the elbow"
                         lastStage = "right position"
-                    elif landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y <= shoulderRightY + 0.1 and rightWristXCounter > 1 and stage != 'return right hand to the side, left hand to the elbow':
+                    elif landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y <= shoulderRightY + 0.05 and rightWristXCounter > 1 and stage != 'return right hand to the side, left hand to the elbow':
                         stage = "left position"
                         lastStage = "left position"
                         counter += 1
@@ -265,11 +265,11 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                    lastStage = "left position"
             elif anglePose >= 160 and leftShoulderCheck == True and rightShoulderCheck == True and angleLeftHand < 30 and landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x / 2.5 <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x)  and (angleRightHand > 160) and stage == 'left position':
                 
-                if  wristLeftY > ((shoulderLeftY + shoulderRightY) / 2) - 0.1 and landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x / 2.5 <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) :
-                    if landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y > shoulderLeftY + 0.1 and leftWristXCounter > 4:
+                if  wristLeftY > ((shoulderLeftY + shoulderRightY) / 2) - 0.07 and landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x / 2.5 <= (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x) :
+                    if landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y > shoulderLeftY + 0.05 and leftWristXCounter > 4:
                         stage = "return left hand to the side, right hand to the elbow"
                         lastStage = "left position"
-                    elif landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y <= shoulderLeftY + 0.1 and leftWristXCounter > 1 and stage != 'return left hand to the side, right hand to the elbow':
+                    elif landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y <= shoulderLeftY + 0.05 and leftWristXCounter > 1 and stage != 'return left hand to the side, right hand to the elbow':
                         stage = "right position"
                         lastStage = "right position"
                         counter += 1
