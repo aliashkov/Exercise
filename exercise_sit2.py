@@ -297,7 +297,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
         # Stage data
         cv2.putText(image, 'STAGE', (115, 12),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
-        if len(stage) < 15:
+        if len(stage) or stage == 'None' < 15:
           cv2.putText(image, stage,
                     (115, 55),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
