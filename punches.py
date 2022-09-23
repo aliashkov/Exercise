@@ -28,9 +28,9 @@ def calculate_angle(a, b, c):
 
 def calculate_angle_level(angle_counter , first_angle , second_angle):
     
-    if (first_angle + second_angle >= 25)  and (first_angle + second_angle < 320):
+    if (first_angle + second_angle >= 20)  and (first_angle + second_angle < 300):
         angle_counter = 0
-    elif (first_angle + second_angle < 25)  or (first_angle + second_angle > 320):
+    elif (first_angle + second_angle < 20)  or (first_angle + second_angle > 300):
         angle_counter += 1  
     return angle_counter
        
@@ -89,7 +89,6 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             handsLevelCounter = angleCounter
            
             # Counter logic
-            print(landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x)
             
             if (landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x <= 0.01 or landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x >= 0.99) \
                 or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x <= 0.01 or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x >= 0.99 \
@@ -102,10 +101,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                     stage = "return right hand to the side, left hand to the elbow"
                 elif lastStage == "left position":
                     stage = "return left hand to the side, right hand to the elbow"
-            elif angleLeftHand + angleRightHand > 300 and stage == 'initial pose':
-                    lastStage = None
-                    stage = "return hands to the initial pose"   
-            elif angleLeftHand < 15 and angleRightHand > 50 and stage == 'initial pose'  and stage != 'right position':
+            elif angleLeftHand < 15 and angleRightHand > 30  and landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y + 0.2 > landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y and stage == 'initial pose'  and stage != 'right position':
                 if (landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y <= landmarks[mp_pose.PoseLandmark.RIGHT_EYE.value].y - 0.1) \
                     or (landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x > landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x \
                         or landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x < landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x - 0.3):
@@ -116,7 +112,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                        stage = "right position"
                        lastStage = "right position"
                        counter += 1
-            elif angleLeftHand > 50 and angleRightHand < 15 and stage == 'initial pose' and stage != 'left position':
+            elif angleLeftHand > 30 and  landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y + 0.2 > landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y and angleRightHand < 15 and stage == 'initial pose' and stage != 'left position':
                 if (landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y <= landmarks[mp_pose.PoseLandmark.LEFT_EYE.value].y - 0.1) \
                     or (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x < landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x \
                         or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x > landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x + 0.3):
@@ -127,7 +123,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                     stage = "left position"
                     lastStage = "left position"
                     counter += 1
-            elif  (angleLeftHand + angleRightHand > 300  or  handsLevelCounter > 8)   and stage == 'right position':
+            elif  handsLevelCounter > 13 and stage == 'right position':
                 stage = "return right hand to the side, left hand to the elbow"
                 lastStage = "right position"
             elif stage == 'right position'  \
@@ -135,7 +131,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                     or landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x > landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + 0.3 ):
                        stage = "return right hand to the side, left hand to the elbow"
                        lastStage = "right position" 
-            elif angleLeftHand > 50 and angleRightHand < 15 and stage == 'right position':
+            elif angleLeftHand > 30  and landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y + 0.2 > landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y and angleRightHand < 15 and stage == 'right position':
                 if  (landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y <= landmarks[mp_pose.PoseLandmark.LEFT_EYE.value].y - 0.1) \
                     or  (landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x  > landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x \
                         or landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x > landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + 0.3 ):
@@ -146,7 +142,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                        stage = "left position"
                        lastStage = "left position"
                        counter += 1
-            elif  (angleLeftHand + angleRightHand > 300  or  handsLevelCounter > 8)  and stage == 'left position':
+            elif handsLevelCounter > 10 and stage == 'left position':
                 stage = "return left hand to the side, right hand to the elbow"
                 lastStage = "left position"
             elif stage == 'left position' \
@@ -154,7 +150,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                     or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x < landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x - 0.3):
                            stage = "return left hand to the side, right hand to the elbow"
                            lastStage = "left position" 
-            elif  angleLeftHand < 15 and angleRightHand > 50 and stage == 'left position':
+            elif  angleLeftHand < 15 and angleRightHand > 30  and landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y + 0.2 > landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y and stage == 'left position':
                 if landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y <= landmarks[mp_pose.PoseLandmark.RIGHT_EYE.value].y - 0.1 \
                    and (landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x < landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x  \
                         or landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x < landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x - 0.3):
@@ -174,7 +170,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                                     and landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x <= landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x \
                                         and landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x <= landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + 0.3 ) :
                                            stage = "initial pose"
-            elif lastStage == "right position" and  angleLeftHand < 15 and angleRightHand > 50 \
+            elif lastStage == "right position" and  angleLeftHand < 15 and angleRightHand > 30  and landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y + 0.2 > landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y \
                 and landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x > 0.01 and landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x < 0.99 \
                     and landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x > 0.01 and landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x < 0.99 \
                         and landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y < 1.05 and landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y < 1.05 \
@@ -183,7 +179,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                                     and landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x <= landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x \
                                         and landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x <= landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x + 0.3 ) :
                                            stage = "right position"
-            elif lastStage == "left position" and   angleLeftHand > 50 and angleRightHand < 15 \
+            elif lastStage == "left position" and   angleLeftHand > 30  and landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y + 0.2 > landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y and angleRightHand < 15 \
                 and landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x > 0.01 and landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x < 0.99 \
                     and landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x > 0.01 and landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x < 0.99 \
                         and landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y < 1.05 and landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y < 1.05 \
