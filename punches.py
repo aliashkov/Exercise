@@ -209,18 +209,23 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
         # Stage data
         cv2.putText(image, 'STAGE', (115, 12),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
-        if len(stage) < 15:
-            cv2.putText(image, stage,
+        if stage != None:
+           if len(stage) < 15:
+             cv2.putText(image, stage,
                     (115, 55),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
-        elif len(stage) >= 15 and len(stage) < 25:
-            cv2.putText(image, stage,
+           elif len(stage) >= 15 and len(stage) < 25:
+             cv2.putText(image, stage,
                     (115, 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
-        if len(stage) >= 25:
-            cv2.putText(image, stage,
+           elif len(stage) >= 25:
+             cv2.putText(image, stage,
                     (115, 45),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.57, (255, 255, 255), 2, cv2.LINE_AA)      
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.57, (255, 255, 255), 2, cv2.LINE_AA)     
+        elif stage == None:
+            cv2.putText(image, 'out of vision',
+                    (115, 55),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)      
         # Render detections
         mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
                                   mp_drawing.DrawingSpec(
