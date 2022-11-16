@@ -13,11 +13,14 @@ hands_videos = mp_hands.Hands(static_image_mode=False, max_num_hands=2)
 # Initialize the mediapipe drawing class.
 mp_drawing = mp.solutions.drawing_utils
 
+# Hands Counter
 counter = 0
 fingerCount = 0
 frameCounter = 5
 
 stage = "Too far from camera or incorrect position"
+
+#Left hand position
 
 leftHandFrames = 0
 isLeftHandFixating = False
@@ -25,6 +28,8 @@ leftHandPosition = 0
 leftHandDistanceLevel = 50
 isLeftHandDown = False
 isLeftHandUp = False
+
+#Right hand position
 
 rightHandFrames = 0
 isRightHandFixating = False
@@ -37,6 +42,8 @@ handsDirection = False
 
 def handsChangeDirection(currentLeftHandDistance , currentRightHandDistance):
   
+  # Extracting data from current hand position
+  
   handsNewDirection = handsDirection
   counterHands = counter
   isRHandUp = isRightHandUp
@@ -44,6 +51,7 @@ def handsChangeDirection(currentLeftHandDistance , currentRightHandDistance):
   isLHandDown = isLeftHandDown
   isRHandDown = isRightHandDown
   
+  # If your hands up
   if not handsDirection:
     if currentLeftHandDistance < -(leftHandDistanceLevel / 8):
       isLHandDown = True
@@ -55,6 +63,8 @@ def handsChangeDirection(currentLeftHandDistance , currentRightHandDistance):
     else:
       isRHandDown = False
                 
+    # Changing stage due to changing direction of your hands
+    
     if (not isLeftHandDown and not isRightHandDown):
       stage = "Put your hands down"
     if (isLeftHandDown and not isRightHandDown):
@@ -66,7 +76,8 @@ def handsChangeDirection(currentLeftHandDistance , currentRightHandDistance):
       isRHandDown = False
       isLHandDown = False
       stage = "Put your hands up"
-                
+          
+  # If your hands down
   if  handsDirection:
     if currentLeftHandDistance > (leftHandDistanceLevel / 2):
       isLHandUp = True
@@ -77,6 +88,8 @@ def handsChangeDirection(currentLeftHandDistance , currentRightHandDistance):
       isRHandUp = True
     else:
       isRHandUp = False
+      
+    # Changing stage due to changing direction of your hands
                 
     if (not isLeftHandUp and not isRightHandUp):
       stage = "Put your hands up"
@@ -104,9 +117,7 @@ def countFingers(image, results, draw=True, display=True):
     # Create a copy of the input image to write the count of fingers on.
     output_image = image.copy()
     
-    # Initialize a dictionary to store the count of fingers of both hands.
-    count = {'RIGHT': 0, 'LEFT': 0}
-        
+    # Hands initial position
     hands = 0
     leftHandFixating = 0
     rightHandFixating = 0
@@ -114,6 +125,8 @@ def countFingers(image, results, draw=True, display=True):
     rightHandPos = 0
     isLeftHandMoved = False
     isRightHandMoved = False
+    
+    # Hands distance
     
     rightHandDistance = 0
     leftHandDistance = 0
@@ -139,22 +152,29 @@ def countFingers(image, results, draw=True, display=True):
         
         distanceWristMiddleFinglerMCP = (hand_landmarks.landmark[0].y - hand_landmarks.landmark[9].y)
         distanceIndexFinger =  abs(hand_landmarks.landmark[17].x - hand_landmarks.landmark[5].x)
-
+         
+        # If hand located in camera add amount of hands
         
         if (hand_landmarks.landmark[0].y < 1 and hand_landmarks.landmark[0].y > 0) \
           and (hand_landmarks.landmark[0].x < 1 and hand_landmarks.landmark[0].x > 0) \
             and (hand_landmarks.landmark[4].y < 1 and hand_landmarks.landmark[4].y > 0) \
               and (hand_landmarks.landmark[4].x < 1 and hand_landmarks.landmark[4].x > 0):
                 hands += 1
+                
+                # If hand is close to camera add hand position
                 if distanceWristMiddleFinglerMCP > 0.15 and  hand_label == "Right" and not isRightHandFixating:
                   rightHandPos = hand_landmarks.landmark[1].x
                   rightHandFixating += 1   
                   rightHandDistance = distanceWristMiddleFinglerMCP
-          
+                
+                # If hand is close to camera add hand position
+                
                 if distanceWristMiddleFinglerMCP > 0.15 and  hand_label == "Left" and not isLeftHandFixating:
                   leftHandPos = hand_landmarks.landmark[1].x
                   leftHandFixating += 1 
                   leftHandDistance =  distanceWristMiddleFinglerMCP 
+                  
+        # Add hands distance
                   
         if hand_label == "Right":
           currentLeftHandDistance = distanceWristMiddleFinglerMCP   
@@ -162,7 +182,8 @@ def countFingers(image, results, draw=True, display=True):
         if hand_label == "Left":
           currentrightHandDistance = distanceWristMiddleFinglerMCP  
                   
-        #print(rightHandPosition , hand_landmarks.landmark[1].x)
+        # If hands moved more than needed
+        
         if hand_label == "Right" and isRightHandFixating and abs(rightHandPosition - hand_landmarks.landmark[1].x)  > 0.13:
           isRightHandMoved = True
                   
@@ -242,61 +263,74 @@ while camera_video.isOpened():
         frame, count , amountHands , rightHandFixating , leftHandFixating , rightHandPos, \
           leftHandPos , isRightHandMoved , isLeftHandMoved, rightHandDistance, leftHandDistance , \
             currentLeftHandDistance , currentRightHandDistance = countFingers(frame, results, display=False)
+            
         
+        # If rightHand is fixating add correct frames
         if (rightHandFixating == 1 and not isRightHandFixating):
           rightHandFrames += 1
-          
+        
+        # If rightHand is not fixating nullify correct frames  
         if (rightHandFixating == 0 and not isRightHandFixating):
           rightHandFrames = 0
           
+        # If enough correct frames just add coordinates to your hand
         if (rightHandFrames > 3 and not isRightHandFixating):
           rightHandPosition = rightHandPos
           rightHandDistanceLevel = rightHandDistance
           isRightHandFixating = not isRightHandFixating
           rightHandFrames = 0
           
+        # If hand moved then add moved frames
         if (isRightHandMoved and isRightHandFixating):
           rightHandFrames += 1
+          
+          # If moved frames more than needed nullify your position
           if (rightHandFrames >= 6):
             rightHandPosition = 0
             isRightHandFixating = not isRightHandFixating
             rightHandFrames = 0
             
-          
+        # If right hand is not moved nullify moved frames  
         if (not isRightHandMoved and isRightHandFixating):
           rightHandFrames = 0
           
-          
+          # If leftHand is fixating add correct frames  
         if (leftHandFixating == 1 and not isLeftHandFixating):
           leftHandFrames += 1
           
+        # If leftHand is not fixating nullify correct frames
         if (leftHandFixating == 0 and not isLeftHandFixating):
           leftHandFrames = 0
           
+        # If enough correct frames just add coordinates to your hand
         if (leftHandFrames > 3 and not isLeftHandFixating):
           leftHandPosition = leftHandPos
           isLeftHandFixating = not isLeftHandFixating
           leftHandDistanceLevel = leftHandDistance
           leftHandFrames = 0
           
+        # If hand moved then add moved frames
         if (isLeftHandMoved and isLeftHandFixating):
           leftHandFrames += 1
+           # If moved frames more than needed nullify your position
+           
           if (leftHandFrames >= 6):
             leftHandPosition = 0
             isLeftHandFixating = not isLeftHandFixating
             leftHandFrames = 0
             
-          
+        # If hand moved then add moved frames  
         if (not isLeftHandMoved and isLeftHandFixating):
           leftHandFrames = 0
             
+        # Checking amountHands in camera
         if (amountHands == 2):
           frameCounter = 0
         else:
           frameCounter += 1
           
     
-            
+        # If hands located out of view more than certain time limit nulify your position    
         if (amountHands < 2) and frameCounter > 12:
             stage = "Too far from camera or incorrect position"
             leftHandPosition = 0
@@ -307,6 +341,8 @@ while camera_video.isOpened():
             rightHandFrames = 0
             handsDirection = False
         else:
+          # Checking hands fixating
+          
           if not isLeftHandFixating:
             stage = "Your left hand isn't fixating"
             handsDirection = False
@@ -323,6 +359,7 @@ while camera_video.isOpened():
             isRightHandUp = isRHandUp
             isLeftHandUp = isLHandUp
     
+    # If in this moment no hands founded nulify your position
     if (results.multi_handedness == None):
       stage = "Too far from camera or incorrect position"
       leftHandPosition = 0
