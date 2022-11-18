@@ -40,7 +40,7 @@ isRightHandUp = False
 
 handsDirection = False
 
-def handsChangeDirection(currentLeftHandDistance , currentRightHandDistance):
+def handsChangeDirection(currentLeftHandDistance , currentRightHandDistance , results):
   
   # Extracting data from current hand position
   
@@ -51,15 +51,73 @@ def handsChangeDirection(currentLeftHandDistance , currentRightHandDistance):
   isLHandDown = isLeftHandDown
   isRHandDown = isRightHandDown
   
+  # Dots for left hand 
+  
+  leftIndexFingerDip = 0
+  leftMiddleFingerDip = 0
+  leftRingIndexFingerDip = 0
+  leftPinkyDip = 0
+  leftIndexFingerTip = 0
+  leftMiddleFingerTip = 0
+  leftRingIndexFingerTip = 0
+  leftPinkyTip = 0
+  
+  
+  # Dots for right hand
+  
+  rightIndexFingerDip = 0
+  rightMiddleFingerDip = 0
+  rightRingIndexFingerDip = 0
+  rightPinkyDip = 0
+  rightIndexFingerTip = 0
+  rightMiddleFingerTip = 0
+  rightRingIndexFingerTip = 0
+  rightPinkyTip = 0
+  
+  for hand_index, hand_info in enumerate(results.multi_handedness):
+        # print((results.multi_hand_landmarks[hand_index]))
+        # Retrieve the label of the found hand.
+        hand_label = hand_info.classification[0].label
+        
+        hand_landmarks =  results.multi_hand_landmarks[hand_index]
+        
+        # Adding current position for each hand
+        
+        if (hand_label == "Left"):
+          leftIndexFingerDip = hand_landmarks.landmark[7].y
+          leftMiddleFingerDip = hand_landmarks.landmark[11].y
+          leftRingIndexFingerDip = hand_landmarks.landmark[15].y
+          leftPinkyDip = hand_landmarks.landmark[19].y
+          leftIndexFingerTip = hand_landmarks.landmark[8].y
+          leftMiddleFingerTip = hand_landmarks.landmark[12].y
+          leftRingIndexFingerTip = hand_landmarks.landmark[16].y
+          leftPinkyTip = hand_landmarks.landmark[20].y
+          
+        else:
+          rightIndexFingerDip = hand_landmarks.landmark[7].y
+          rightMiddleFingerDip = hand_landmarks.landmark[11].y
+          rightRingIndexFingerDip = hand_landmarks.landmark[15].y
+          rightPinkyDip = hand_landmarks.landmark[19].y
+          rightIndexFingerTip = hand_landmarks.landmark[8].y
+          rightMiddleFingerTip = hand_landmarks.landmark[12].y
+          rightRingIndexFingerTip = hand_landmarks.landmark[16].y
+          rightPinkyTip = hand_landmarks.landmark[20].y
+  
+                
   # If your hands up
+
   if not handsDirection:
-    if currentLeftHandDistance < -(leftHandDistanceLevel / 8):
-      isLHandDown = True
+    if ((currentLeftHandDistance < -(leftHandDistanceLevel / 8)) and (leftIndexFingerDip < leftIndexFingerTip) \
+      and (leftMiddleFingerDip < leftMiddleFingerTip) and  (leftRingIndexFingerDip < leftRingIndexFingerTip) \
+        and (leftPinkyDip < leftPinkyTip)):
+          isLHandDown = True
     else:
       isLHandDown = False
               
-    if currentRightHandDistance < -(rightHandDistanceLevel / 8):
-      isRHandDown = True
+    if ((currentRightHandDistance < -(rightHandDistanceLevel / 8)) and (rightIndexFingerDip < rightIndexFingerTip) \
+      and (rightMiddleFingerDip < rightMiddleFingerTip) and  (rightRingIndexFingerDip < rightRingIndexFingerTip) \
+        and (rightPinkyDip < rightPinkyTip)):
+          isRHandDown = True
     else:
       isRHandDown = False
                 
@@ -79,13 +137,17 @@ def handsChangeDirection(currentLeftHandDistance , currentRightHandDistance):
           
   # If your hands down
   if  handsDirection:
-    if currentLeftHandDistance > (leftHandDistanceLevel / 2):
-      isLHandUp = True
+    if ((currentLeftHandDistance > (leftHandDistanceLevel / 2)) and (leftIndexFingerDip > leftIndexFingerTip) \
+      and (leftMiddleFingerDip > leftMiddleFingerTip) and  (leftRingIndexFingerDip > leftRingIndexFingerTip) \
+        and (leftPinkyDip > leftPinkyTip)):
+          isLHandUp = True
     else:
       isLHandUp = False
               
-    if currentRightHandDistance > (rightHandDistanceLevel / 2):
-      isRHandUp = True
+    if ((currentRightHandDistance > (rightHandDistanceLevel / 2)) and (rightIndexFingerDip > rightIndexFingerTip) \
+      and (rightMiddleFingerDip > rightMiddleFingerTip) and  (rightRingIndexFingerDip > rightRingIndexFingerTip) \
+        and (rightPinkyDip > rightPinkyTip)):
+          isRHandUp = True
     else:
       isRHandUp = False
       
@@ -192,7 +254,7 @@ def countFingers(image, results, draw=True, display=True):
 
 
               
-    return output_image,  count ,  hands , rightHandFixating , leftHandFixating, rightHandPos , \
+    return output_image,    hands , rightHandFixating , leftHandFixating, rightHandPos , \
       leftHandPos, isRightHandMoved, isLeftHandMoved ,rightHandDistance , leftHandDistance, \
         currentLeftHandDistance , currentrightHandDistance
     
@@ -257,10 +319,9 @@ while camera_video.isOpened():
     
     # Check if the hands landmarks in the frame are detected.
     
-        print(rightHandPosition , leftHandPosition)
             
         # Count the number of fingers up of each hand in the frame.
-        frame, count , amountHands , rightHandFixating , leftHandFixating , rightHandPos, \
+        frame,  amountHands , rightHandFixating , leftHandFixating , rightHandPos, \
           leftHandPos , isRightHandMoved , isLeftHandMoved, rightHandDistance, leftHandDistance , \
             currentLeftHandDistance , currentRightHandDistance = countFingers(frame, results, display=False)
             
@@ -350,7 +411,7 @@ while camera_video.isOpened():
             stage = "Your right hand isn't fixating"
             handsDirection = False
           if isRightHandFixating and isLeftHandFixating:
-            isLHandDown, isRHandDown , stageHands ,  handsNewDirection , counterHands , isRHandUp , isLHandUp = handsChangeDirection(currentLeftHandDistance , currentRightHandDistance)
+            isLHandDown, isRHandDown , stageHands ,  handsNewDirection , counterHands , isRHandUp , isLHandUp = handsChangeDirection(currentLeftHandDistance , currentRightHandDistance , results)
             isLeftHandDown = isLHandDown
             isRightHandDown = isRHandDown
             stage = stageHands
