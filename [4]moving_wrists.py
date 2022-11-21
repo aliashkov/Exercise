@@ -195,6 +195,29 @@ def countFingers(image, results, draw=True, display=True):
     currentLeftHandDistance = 0
     currentrightHandDistance = 0
     
+    # Dots for left hand 
+  
+    leftIndexFingerDip = 0
+    leftMiddleFingerDip = 0
+    leftRingIndexFingerDip = 0
+    leftPinkyDip = 0
+    leftIndexFingerTip = 0
+    leftMiddleFingerTip = 0
+    leftRingIndexFingerTip = 0
+    leftPinkyTip = 0
+  
+   # Dots for right hand
+  
+    rightIndexFingerDip = 0
+    rightMiddleFingerDip = 0
+    rightRingIndexFingerDip = 0
+    rightPinkyDip = 0
+    rightIndexFingerTip = 0
+    rightMiddleFingerTip = 0
+    rightRingIndexFingerTip = 0
+    rightPinkyTip = 0
+    
+    
     # Iterate over the found hands in the image.
     for hand_index, hand_info in enumerate(results.multi_handedness):
         # print((results.multi_hand_landmarks[hand_index]))
@@ -208,9 +231,31 @@ def countFingers(image, results, draw=True, display=True):
             
         if hand_index == 1 and firstHand == hand_label:
             continue 
-        
+          
         # Retrieve the landmarks of the found hand.
         hand_landmarks =  results.multi_hand_landmarks[hand_index]
+          
+        if (hand_label == "Left"):
+          leftIndexFingerDip = hand_landmarks.landmark[7].y
+          leftMiddleFingerDip = hand_landmarks.landmark[11].y
+          leftRingIndexFingerDip = hand_landmarks.landmark[15].y
+          leftPinkyDip = hand_landmarks.landmark[19].y
+          leftIndexFingerTip = hand_landmarks.landmark[8].y
+          leftMiddleFingerTip = hand_landmarks.landmark[12].y
+          leftRingIndexFingerTip = hand_landmarks.landmark[16].y
+          leftPinkyTip = hand_landmarks.landmark[20].y
+          
+        else:
+          rightIndexFingerDip = hand_landmarks.landmark[7].y
+          rightMiddleFingerDip = hand_landmarks.landmark[11].y
+          rightRingIndexFingerDip = hand_landmarks.landmark[15].y
+          rightPinkyDip = hand_landmarks.landmark[19].y
+          rightIndexFingerTip = hand_landmarks.landmark[8].y
+          rightMiddleFingerTip = hand_landmarks.landmark[12].y
+          rightRingIndexFingerTip = hand_landmarks.landmark[16].y
+          rightPinkyTip = hand_landmarks.landmark[20].y
+        
+
         
         distanceWristMiddleFinglerMCP = (hand_landmarks.landmark[0].y - hand_landmarks.landmark[9].y)
         distanceIndexFinger =  abs(hand_landmarks.landmark[17].x - hand_landmarks.landmark[5].x)
@@ -224,17 +269,23 @@ def countFingers(image, results, draw=True, display=True):
                 hands += 1
                 
                 # If hand is close to camera add hand position
-                if distanceWristMiddleFinglerMCP > 0.15 and  hand_label == "Right" and not isRightHandFixating:
-                  rightHandPos = hand_landmarks.landmark[1].x
-                  rightHandFixating += 1   
-                  rightHandDistance = distanceWristMiddleFinglerMCP
+                if distanceWristMiddleFinglerMCP > 0.15 and  hand_label == "Right" and not isRightHandFixating \
+                  and (rightIndexFingerDip > rightIndexFingerTip) \
+                    and (rightMiddleFingerDip > rightMiddleFingerTip) and  (rightRingIndexFingerDip > rightRingIndexFingerTip) \
+                      and (rightPinkyDip > rightPinkyTip):
+                        rightHandPos = hand_landmarks.landmark[1].x
+                        rightHandFixating += 1   
+                        rightHandDistance = distanceWristMiddleFinglerMCP
                 
                 # If hand is close to camera add hand position
                 
-                if distanceWristMiddleFinglerMCP > 0.15 and  hand_label == "Left" and not isLeftHandFixating:
-                  leftHandPos = hand_landmarks.landmark[1].x
-                  leftHandFixating += 1 
-                  leftHandDistance =  distanceWristMiddleFinglerMCP 
+                if distanceWristMiddleFinglerMCP > 0.15 and  hand_label == "Left" and not isLeftHandFixating\
+                  and (leftIndexFingerDip > leftIndexFingerTip) \
+                    and (leftMiddleFingerDip > leftMiddleFingerTip) and  (leftRingIndexFingerDip > leftRingIndexFingerTip) \
+                      and (leftPinkyDip > leftPinkyTip):
+                        leftHandPos = hand_landmarks.landmark[1].x
+                        leftHandFixating += 1 
+                        leftHandDistance =  distanceWristMiddleFinglerMCP 
                   
         # Add hands distance
                   
